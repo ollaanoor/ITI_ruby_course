@@ -17,130 +17,174 @@
 # 	- Display message if the input is empty or incorrect
 
 class Inventory
-  attr_reader :title, :author, :isbn, :count # can be changed from outside
+  attr_reader :title, :author, :isbn, :count # can be read from outside
 
   def initialize(title, author, isbn)
     @title = title
     @author = author
     @isbn = isbn
-    @count = 0
+    @count = 1
   end
 
   def add_to_list
-    books = File.readlines("inventory.txt") #array of all books
+    books = File.readlines("inventory.txt") # Array of all books
     updated = false
-    for book in books 
-        books.delete(book)
+
+    books.map! { |book|
         details = book.split
-        if details[-2].to_i == self.isbn.to_i #book already exists 
-            details[-1] = (details[-1].to_i + 1).to_s  #increase count
+        if details[-2].to_i == self.isbn.to_i  # If book already exists
+            details[-1] = (details[-1].to_i + 1).to_s  # Increase count
 
-            #update the title and author if changed
-            if details[0] != self.title
-                details[0] =  self.title
-            end
+            # Update the title and author if changed
+            details[0] = self.title if details[0] != self.title
+            details[1] = self.author if details[1] != self.author
 
-            if details[1] != self.author
-                details[1] =  self.author
-            end
-
-            books << details.join(" ")
-            File.write("inventory.txt", books.join("\n"), mode: "w")
-            File.write("inventory.txt", "\n", mode: "a")
-            updated = true 
+            updated = true
         end
-    end 
+        details.join(" ")
+    }
 
-    File.write("inventory.txt", "#{self.title} #{self.author} #{self.isbn} #{self.count}\n", mode: "a") unless updated
+    books << "#{self.title} #{self.author} #{self.isbn} #{self.count}" unless updated
+    books.sort_by! { |book| book.split[-2].to_i } # Sorting books by ISBN
+    File.write("inventory.txt", books.join("\n"))
   end
 
   def self.list_books
-    File.foreach("inventory.txt") { |line| puts line }
+    puts "\nInventory:"
+    # File.foreach("inventory.txt") { |line| puts line }
+    File.foreach("inventory.txt") { |line|
+        details = line.split
+        puts "Title: #{details[0]}\nAuthor: #{details[1]}\nISBN: #{details[2]}\nCount: #{details[3]}\n\n"
+    }
+
   end
 
   def self.remove_book(isbn)
-    # book_isbn = File.foreach("inventory.txt") { |line| puts line.include?(isbn.to_s) }
-    # puts book_isbn.to_i == isbn 
-    # if book_isbn.to_i == isbn 
-    #     puts "deleted"
-    # end
-    # books = File.read("inventory.txt").split
-    books = File.readlines("inventory.txt") #array of all books
-    # books.each { |book| book.split[-1] } #isbn
+    books = File.readlines("inventory.txt")
+    found = false
+
     for book in books 
         if book.split[-2].to_i == isbn
             books.delete(book)
+            found = true
             break
         end
     end 
+
     # puts books
-    File.write("inventory.txt", books.join("\n"), mode: "w")
+    puts "Not found." unless found
+    File.write("inventory.txt", books.join("\n"), mode: "w") unless !found
   end
 
   def self.search_by_ISBN(isbn)
-    books = File.readlines("inventory.txt") #array of all books
+    books = File.readlines("inventory.txt") 
+    found = false
+
     for book in books 
         details = book.split
-        if details[-2].to_i == isbn #book already exists 
-            puts "#{book} \n"
+        if details[-2].to_i == isbn 
+            # puts book
+            puts "Title: #{details[0]}\nAuthor: #{details[1]}\nISBN: #{details[2]}\nCount: #{details[3]}\n\n"
+            found = true
         end
     end
+
+    puts "Not found." unless found
   end
 
   def self.search_by_title(title)
-    books = File.readlines("inventory.txt") #array of all books
+    books = File.readlines("inventory.txt") 
+    found = false
+
     for book in books 
         details = book.split
         if details[0] == title 
-            puts "#{book} \n"
+            # puts book
+            puts "Title: #{details[0]}\nAuthor: #{details[1]}\nISBN: #{details[2]}\nCount: #{details[3]}\n\n"
+            found = true
         end
     end
+
+    puts "Not found." unless found
   end
 
   def self.search_by_author(author)
-    books = File.readlines("inventory.txt") #array of all books
+    books = File.readlines("inventory.txt") 
+    found = false
+
     for book in books 
         details = book.split
         if details[1] == author  
-            puts "#{book} \n"
+            # puts book
+            puts "Title: #{details[0]}\nAuthor: #{details[1]}\nISBN: #{details[2]}\nCount: #{details[3]}\n\n"
+            found = true
         end
     end
+
+    puts "Not found." unless found
   end
 
 end
 
 while true
-    puts "Enter:\n1 to add new book\n2 to list books\n3 to remove a book\n4 to search by ISBN\n5 to search by Title\n6 to search by Author\n"
+    puts "\nEnter:\n1 to add new book\n2 to list books\n3 to remove a book\n4 to search by ISBN\n5 to search by Title\n6 to search by Author\n"
     op = gets.chomp
+
     case op
     when "1"
         puts "\nEnter title"
         name = gets.chomp
+
         puts "\nEnter author"
         author = gets.chomp
+
         puts "\nEnter ISBN"
         isbn = gets.chomp
 
-        book = Inventory.new name,author,isbn
-        book.add_to_list
+        if name.empty? || author.empty? || isbn.empty? 
+            puts "\nInvalid input. Title, Author, and ISBN cannot be empty"
+        else
+            book = Inventory.new name,author,isbn
+            book.add_to_list
+        end
     when "2"
         Inventory.list_books
     when "3"
-        puts "\nEnter ISBN of book "
-        isbn = gets.chomp.to_i
-        Inventory.remove_book(isbn)
+        puts "\nEnter ISBN of book: "
+        isbn = gets.chomp
+
+        if isbn.empty?
+            puts "\nInvalid ISBN! Please enter a valid number."
+        else
+            Inventory.remove_book(isbn.to_i)
+        end
     when "4"
-        puts "\nSearch by ISBN\nEnter ISBN "
-        isbn = gets.chomp.to_i
-        Inventory.search_by_ISBN(isbn)
+        puts "\nSearch by ISBN\nEnter ISBN: "
+        isbn = gets.chomp
+
+        if isbn.empty?
+            puts "\nInvalid ISBN! Please enter a valid number."
+        else
+            Inventory.search_by_ISBN(isbn.to_i)
+        end
     when "5"
-        puts "\nSearch by Title\nEnter title "
+        puts "\nSearch by Title\nEnter title: "
         title = gets.chomp
-        Inventory.search_by_title(title)
+
+        if title.empty?
+            puts "\nInvalid title! Please enter a valid book title."
+        else
+            Inventory.search_by_title(title)
+        end
     when "6"
-        puts "\nSearch by Author\nEnter Author "
+        puts "\nSearch by Author\nEnter Author: "
         author = gets.chomp
-        Inventory.search_by_author(author)
+
+        if author.empty?
+            puts "\nInvalid author name! Please enter a valid author name."
+        else
+            Inventory.search_by_author(author)
+        end
     else
         puts "\nInvalid option"
     end
