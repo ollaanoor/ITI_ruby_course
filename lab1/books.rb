@@ -190,8 +190,8 @@ while true
     end
 end
 
-# book1 = Inventory.new 'All the bright places', 'XYZ', 1234
-# book2 = Inventory.new 'A good girls guide to murder', 'ABC', 5678
+# book1 = Inventory.new 'All the bright places', 'XYZ', 12345678
+# book2 = Inventory.new 'A good girls guide to murder', 'ABC', 56781234
 # book1.add_to_list
 # book2.add_to_list
 
