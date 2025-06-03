@@ -1,0 +1,15 @@
+<div id="<%= dom_id article %>">
+  <p>
+    <strong>Body:</strong>
+    <%= article.body %>
+  </p>
+  
+  <% if article.image.attached? %>
+    <%= image_tag article.image %>
+  <% end %>
+
+  <% if can? :report, article %>
+    <%= button_to "Report", report_article_path(article), method: :post, data: { confirm: "Are you sure?" } %>
+  <% end %>
+
+</div>
