@@ -1,7 +1,0 @@
-2025-05-31 16:22:44 +0300 -- info -- Processing Transactions: User Ali transaction with value -20, Processing Transactions: User Ali transaction with value -30, Processing Transactions: User Ali transaction with value -60, Processing Transactions: User Ali transaction with value -100, Processing Transactions: User Ali transaction with value -100, Processing Transactions: User Menna transaction with value -100
-2025-05-31 16:22:44 +0300 -- info -- User Ali transaction with value -20 succeeded
-2025-05-31 16:22:44 +0300 -- info -- User Ali transaction with value -30 succeeded
-2025-05-31 16:22:44 +0300 -- info -- User Ali transaction with value -60 succeeded
-2025-05-31 16:22:44 +0300 -- error -- Transaction failed for User Ali: Not enough balance
-2025-05-31 16:22:44 +0300 -- error -- Transaction failed for User Ali: Not enough balance
-2025-05-31 16:22:44 +0300 -- error -- User Menna transaction with value -100 failed with message Menna does not exist in the bank!
